@@ -10,6 +10,14 @@ from flask import make_response, abort
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+@app.route('/qualityprediction', methods=['GET'])
+def usage():
+    usage = 'This is the server to predict the reflection quality \n \
+            Command line usage:\n \
+            $curl -i -H "Content-Type: application/json" -X POST -d \'{"text":"put a student response here"}\' http://coursemirror.cloudapp.net/qualityprediction'
+    
+    return jsonify({'usage': usage})
+
 import random
 @app.route('/qualityprediction', methods=['POST'])
 def predict():
