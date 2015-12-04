@@ -14,19 +14,21 @@ def not_found(error):
 def usage():
     usage = 'This is the server to predict the reflection quality \n \
             Command line usage:\n \
-            $curl -i -H "Content-Type: application/json" -X POST -d \'{"text":"put a student response here"}\' http://coursemirror.cloudapp.net/qualityprediction'
+            $curl -i -H "Content-Type: application/json" -X POST -d \'{"course":"IE256", "lecture":5, "text":"put a student response here", }\' http://coursemirror.cloudapp.net/qualityprediction'
     
     return jsonify({'usage': usage})
 
 import random
 @app.route('/qualityprediction', methods=['POST'])
 def predict():
-    if not request.json or not 'text' in request.json:
+    if not request.json or not 'text' in request.json or not 'lecture' in request.json or not 'course' in request.json:
         abort(400)
     
     score = random.randint(0,3)
     
-    return jsonify({'text':request.json['text'],
+    return jsonify({'course':request.json['course'],
+                    'lecture':request.json['lecture'],
+                    'text':request.json['text'],
                     'score': score})
 
 if __name__ == "__main__":
