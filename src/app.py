@@ -18,7 +18,7 @@ def not_found(error):
 def usage():
     usage = 'This is the server to predict the reflection quality \n \
             Command line usage:\n \
-            $curl -i -H "Content-Type: application/json" -X POST -d \'{"course":"IE256", "lecture":5, "text":"put a student response here", }\' http://coursemirror.cloudapp.net/qualityprediction'
+            $curl -i -H "Content-Type: application/json" -X POST -d \'{"course":"IE256","lecture":5,"text":"put a student response here", }\' http://coursemirror.cloudapp.net/qualityprediction'
     
     return jsonify({'usage': usage})
 
