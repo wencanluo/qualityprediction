@@ -43,6 +43,8 @@ if __name__ == "__main__":
     with open('../data/classifier_SVM.pickle', 'rb') as handle:
         classifier = pickle.load(handle)
         qp = QualityPrediction(classifier)
+        
+        print qp.predict('nothing')
     
     app.run(host='0.0.0.0', port=80)
     
