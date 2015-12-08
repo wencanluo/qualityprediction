@@ -7,6 +7,7 @@ from flask import jsonify, request
 from flask import make_response, abort
 
 from QualityPrediction import QualityPrediction
+from QualityPredictionTrainer import QualityPredictionTrainer 
 import pickle
 
 @app.errorhandler(404)
@@ -43,5 +44,5 @@ if __name__ == "__main__":
         classifier = pickle.load(handle)
         qp = QualityPrediction(classifier)
     
-    #app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=80)
     
