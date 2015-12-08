@@ -6,6 +6,9 @@ app = Flask(__name__)
 from flask import jsonify, request
 from flask import make_response, abort
 
+from QualityPrediction import QualityPrediction
+import pickle
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
@@ -21,16 +24,24 @@ def usage():
 import random
 @app.route('/qualityprediction', methods=['POST'])
 def predict():
-    if not request.json or not 'text' in request.json or not 'lecture' in request.json or not 'course' in request.json:
+    if not request.json or not 'text' in request.json:
         abort(400)
     
-    score = random.randint(0,3)
+    text = request.json['text']
+    lecture = request.json['lecture'] if 'lecture' in request.json else None
+    cid = request.json['course'] if 'course' in request.json else None
     
-    return jsonify({'course':request.json['course'],
-                    'lecture':request.json['lecture'],
-                    'text':request.json['text'],
+    score = qp.predict(text, cid, lecture)
+    
+    return jsonify({'course':cid,
+                    'lecture':lecture,
+                    'text':text,
                     'score': score})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    with open('../data/classifier_SVM.pickle', 'rb') as handle:
+        classifier = pickle.load(handle)
+        qp = QualityPrediction(classifier)
+    
+    #app.run(host='0.0.0.0', port=80)
     
