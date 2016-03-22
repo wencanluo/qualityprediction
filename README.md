@@ -1,5 +1,7 @@
 # qualityprediction
 
+required softwares
+
 sudo apt-get update
 sudo apt-get install python-pip
 sudo apt-get install python-virtualenv
@@ -15,6 +17,13 @@ pip install numpy
 pip install scipy
 pip install scikit-learn
 pip install nltk
+
+python
 import nltk
 nltk.download('all')
+
+launch
+
+sudo su
+
 
