@@ -1,3 +1,4 @@
 doc
 senna-v2.0
 /data/senna
+/src/*.pyc
