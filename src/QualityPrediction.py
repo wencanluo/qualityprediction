@@ -26,7 +26,13 @@ class QualityPrediction:
         
         if 'pos' in self.features:
             self.tagger = SennaTagger(config.get('model', 'senna'))
-            
+        
+        if 'content' in self.features:
+            self.contentwords = [line.strip().lower() for line in open(config.get('model', 'content')).readlines()]
+        
+        if 'organization' in self.features:
+            self.orgnizationwords = [line.strip().lower() for line in open(config.get('model', "organization")).readlines()]
+        
         featuresets = self._get_training_data()
         self._train_classifier_model(featuresets)
         
@@ -53,13 +59,29 @@ class QualityPrediction:
        
         if 'unigram' in self.features:
             for token in tokens:
-                features['U0'+token.lower()] = 1
+                features['U0_'+token.lower()] = 1
         
         if 'pos' in self.features:
             tags = self.tagger.tag(tokens)
             for _, tag in tags:
-                features['P0'+tag] = 1
-            
+                features['P0_'+tag] = 1
+        
+        if 'content' in self.features:
+            hasContentWord = 0
+            for word in tokens:
+                if word.lower() in self.contentwords:
+                    hasContentWord = 1
+                    break
+            features['C0_'] = hasContentWord
+        
+        if 'organization' in self.features:
+            OrgAssign = 0
+            for word in tokens:
+                if word.lower() in self.orgnizationwords:
+                    OrgAssign = 1
+                    break
+            features['O0_'] = OrgAssign
+                    
         return features
         
     def get_model(self):
