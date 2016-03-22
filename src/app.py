@@ -7,7 +7,6 @@ from flask import jsonify, request
 from flask import make_response, abort
 
 from QualityPrediction import QualityPrediction
-from QualityPredictionTrainer import QualityPredictionTrainer 
 import pickle
 
 @app.errorhandler(404)
@@ -32,7 +31,7 @@ def predict():
     lecture = request.json['lecture'] if 'lecture' in request.json else None
     cid = request.json['course'] if 'course' in request.json else None
     
-    score = qp.predict(text, cid, lecture)
+    score = model.predict(text, cid, lecture)
     
     return jsonify({'course':cid,
                     'lecture':lecture,
@@ -41,10 +40,8 @@ def predict():
 
 if __name__ == "__main__":
     with open('../data/classifier_SVM.pickle', 'rb') as handle:
-        classifier = pickle.load(handle)
-        qp = QualityPrediction(classifier)
-        
-        print qp.predict('nothing')
+        model = pickle.load(handle)
+        print model.predict('nothing')
     
     app.run(host='0.0.0.0', port=80)
     
