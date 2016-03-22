@@ -1,10 +1,11 @@
 import nltk
-import random
 import os
 from nltk.classify.scikitlearn import SklearnClassifier
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 import pickle, json
 import file_util
+from metric import Metric
+from nltk.tag import SennaTagger
 
 class QualityPrediction:
     def __init__(self, config):
@@ -16,12 +17,30 @@ class QualityPrediction:
         self.training_file = config.get('model', 'train')
         self.learning_algorithm = config.get('model', 'classify')
         self.features = config.get('model', 'features').split(',')
-        self.test_file = config.get('model', 'test')
+        #print self.features
+        
+        self.course =  config.get('model', 'course')
+        self.test_file = '../data/' + self.course + '.json'
         
         self._model = None
         
+        if 'pos' in self.features:
+            self.tagger = SennaTagger(config.get('model', 'senna'))
+            
         featuresets = self._get_training_data()
         self._train_classifier_model(featuresets)
+        
+    
+    def evaluate(self):
+        test_featureset = self._get_featuresets(self.test_file)
+        
+        labels = [int(x[1]) for x in test_featureset]
+        featureset = [x[0] for x in test_featureset]
+        predicts = [int(x) for x in self._model.classify_many(featureset)]
+        
+        metric = Metric()
+        
+        return metric.accuracy(labels, predicts), metric.kappa(labels, predicts), metric.QWkappa(labels, predicts)
     
     def get_features(self, text, cid, lecture):
         features = {}
@@ -36,6 +55,11 @@ class QualityPrediction:
             for token in tokens:
                 features['U0'+token.lower()] = 1
         
+        if 'pos' in self.features:
+            tags = self.tagger.tag(tokens)
+            for _, tag in tags:
+                features['P0'+tag] = 1
+            
         return features
         
     def get_model(self):
@@ -72,7 +96,6 @@ class QualityPrediction:
 
         """
         model = None
-        print self.learning_algorithm
         if(self.learning_algorithm == "NB"):
             model = nltk.NaiveBayesClassifier.train(featuresets)
         elif(self.learning_algorithm == "MaxEnt"):
@@ -81,7 +104,7 @@ class QualityPrediction:
         elif(self.learning_algorithm == "DecisionTree"):
             model = nltk.DecisionTreeClassifier.train(featuresets, 0.05)
         elif(self.learning_algorithm == 'SVM'):
-            model = SklearnClassifier(LinearSVC()).train(featuresets)
+            model = SklearnClassifier(SVC(kernel='linear')).train(featuresets)
         self._model = model
         
     def predict(self, text, cid=None, lecture=None):
